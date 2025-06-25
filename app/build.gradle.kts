@@ -66,6 +66,7 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("com.google.dagger:hilt-android:2.50")
     kapt ("com.google.dagger:hilt-compiler:2.50")
+    implementation("io.coil-kt:coil-compose:2.4.0") // or latest version
 
     // Buat ViewModel
     implementation ("androidx.hilt:hilt-navigation-compose:1.1.0")

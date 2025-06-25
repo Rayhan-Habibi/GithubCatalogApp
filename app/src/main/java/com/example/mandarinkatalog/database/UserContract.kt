@@ -9,4 +9,5 @@ object UserContract {
         const val COLUMN_NAME_PASSWORD = "password"
         const val COLUMN_NAME_GITHUB = "github"
     }
+
 }

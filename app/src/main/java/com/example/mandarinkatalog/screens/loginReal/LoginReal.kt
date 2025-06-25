@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 @Composable
-fun Login(
-    viewModel: LoginViewModel,
+fun LoginReal(
+    viewModel: LoginRealViewModel,
     navController: NavHostController
 ) {
 
@@ -27,7 +27,7 @@ fun Login(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp) // Adds space between items
         ) {
-            Text(text = "Register", style = MaterialTheme.typography.headlineMedium)
+            Text(text = "Login", style = MaterialTheme.typography.headlineMedium)
 
             OutlinedTextField(
                 value = viewModel.username,
@@ -46,20 +46,12 @@ fun Login(
                 onValueChange = { viewModel.github = it }
             )
 
-            Row {
-                Button(onClick = {
-                    viewModel.createUserData(context)
-                    viewModel.loginUser()
-                    navController.navigate("home")
-                }) {
-                    Text("Submit")
-                }
-
-                Button(onClick = {
-                    navController.navigate("loginreal")
-                }) {
-                    Text("Login")
-                }
+            Button(onClick = {
+                viewModel.createUserData(context)
+                viewModel.loginUser()
+                navController.navigate("home")
+            }) {
+                Text("Submit")
             }
         }
     }

@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.first
 
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class DetailViewModel @Inject constructor(
     private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
@@ -78,13 +78,5 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
-    private val _selectedRepo = MutableLiveData<ResponseItem?>()
-    val selectedRepo: LiveData<ResponseItem?> = _selectedRepo
-
-    fun selectRepo(repo: ResponseItem) {
-        _selectedRepo.value = repo
-    }
-
 
 }

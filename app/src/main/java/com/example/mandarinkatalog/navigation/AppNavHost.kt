@@ -8,15 +8,18 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.example.mandarinkatalog.dataStore.UserPreferences
+import com.example.mandarinkatalog.screens.detail.Detail
 import com.example.mandarinkatalog.screens.home.Home
 import com.example.mandarinkatalog.screens.home.HomeViewModel
 import com.example.mandarinkatalog.screens.login.Login
@@ -34,7 +37,19 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
     val loginState by userPreferences.getLoginState().collectAsState(initial = false)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val scaffoldEnabled: Boolean = (currentRoute=="login" || currentRoute=="loginreal")
+    val route = navBackStackEntry?.destination?.route
+    val repoName = navBackStackEntry?.arguments?.getString("repoName")
+
+    val showTopBar = route != "login" && route != "loginreal"
+
+    val title = when {
+        route == "home" -> "Repos"
+        route == "search" -> "Search"
+        route == "profile" -> "Profile"
+        route == "starred" -> "Starred"
+        route?.startsWith("detail/") == true -> repoName ?: "Repository"
+        else -> route ?: ""
+    }
 
     // Navigate to "home" if already logged in and currently on "login"
     LaunchedEffect(loginState, currentRoute) {
@@ -49,7 +64,7 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
         topBar = {
             if (currentRoute != "login" && currentRoute != "loginreal") {
                 TopAppBar(
-                    title = { Text(currentRoute ?: "") },
+                    title = { Text(title) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Container,
                         titleContentColor = MaterialTheme.colorScheme.primary
@@ -119,7 +134,7 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
             }
             composable("home") {
                 val viewModel: HomeViewModel = hiltViewModel()
-                Home(viewModel)
+                Home(viewModel, navController)
             }
             composable("search") { Search() }
             composable("profile") { Profile(navController = navController) }
@@ -128,6 +143,20 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
                 val viewModel: LoginRealViewModel = hiltViewModel()
                 LoginReal(navController = navController, viewModel = viewModel)
             }
+            composable(
+                route = "detail/{repoName}",
+                arguments = listOf(navArgument("repoName") {
+                    type = NavType.StringType
+                })
+            ) { backStackEntry ->
+                val repoName = backStackEntry.arguments?.getString("repoName") ?: ""
+                val viewModel: HomeViewModel = hiltViewModel()
+                Detail(
+                    repoName = repoName,
+                    viewModel = viewModel
+                )
+            }
+
         }
     }
 }

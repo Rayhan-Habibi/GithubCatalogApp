@@ -33,7 +33,7 @@ import com.example.mandarinkatalog.ui.theme.ContainerSecondary
 import com.example.mandarinkatalog.ui.theme.Primary
 
 @Composable
-fun PrettyCard(name: String, desc: String) {
+fun PrettyCard(name: String, desc: String, onClick: () -> Unit) {
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -47,7 +47,7 @@ fun PrettyCard(name: String, desc: String) {
             .padding(16.dp)
             .height(cardHeight)
             .width(cardWidth)
-            .clickable(enabled = true, onClick = {})
+            .clickable(onClick = onClick)
     ) {
         // Bottom "shadow" card layer
         Box(

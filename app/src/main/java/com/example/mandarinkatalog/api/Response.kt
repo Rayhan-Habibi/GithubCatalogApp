@@ -16,6 +16,9 @@ data class ResponseItem(
 	@field:SerializedName("stargazers_count")
 	val stargazersCount: Int? = null,
 
+	// ADD THIS FIELD FOR LOCAL USE
+	val starred: Int = 0,
+
 	@field:SerializedName("is_template")
 	val isTemplate: Boolean? = null,
 

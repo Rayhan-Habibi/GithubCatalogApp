@@ -1,14 +1,14 @@
 package com.example.mandarinkatalog.navigation
 
+import android.content.Context
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,6 +28,8 @@ import com.example.mandarinkatalog.screens.login.LoginRealViewModel
 import com.example.mandarinkatalog.screens.login.LoginViewModel
 import com.example.mandarinkatalog.screens.profile.Profile
 import com.example.mandarinkatalog.screens.search.Search
+import com.example.mandarinkatalog.screens.splashscreen.SplashScreen
+import com.example.mandarinkatalog.screens.starred.Starred
 import com.example.mandarinkatalog.ui.theme.Container
 import com.example.mandarinkatalog.ui.theme.Primary
 
@@ -40,7 +42,6 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
     val route = navBackStackEntry?.destination?.route
     val repoName = navBackStackEntry?.arguments?.getString("repoName")
 
-    val showTopBar = route != "login" && route != "loginreal"
 
     val title = when {
         route == "home" -> "Repos"
@@ -62,7 +63,7 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
 
     Scaffold(
         topBar = {
-            if (currentRoute != "login" && currentRoute != "loginreal") {
+            if (currentRoute != "login" && currentRoute != "loginreal" && currentRoute != "splash") {
                 TopAppBar(
                     title = { Text(title) },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -73,24 +74,13 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
             }
         },
         bottomBar = {
-            if (currentRoute != "login" && currentRoute != "loginreal") {
+            if (currentRoute != "login" && currentRoute != "loginreal" && currentRoute != "splash") {
                 NavigationBar(containerColor = Container) {
                     NavigationBarItem(
                         selected = currentRoute == "home",
                         onClick = { navController.navigate("home") },
                         icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                         label = { Text("Repos") },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.White,
-                            unselectedIconColor = Color.Black,
-                            indicatorColor = Primary
-                        )
-                    )
-                    NavigationBarItem(
-                        selected = currentRoute == "search",
-                        onClick = { navController.navigate("search") },
-                        icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                        label = { Text("Search") },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color.White,
                             unselectedIconColor = Color.Black,
@@ -111,7 +101,7 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
                     NavigationBarItem(
                         selected = currentRoute == "starred",
                         onClick = { navController.navigate("starred") },
-                        icon = { Icon(Icons.Default.Star, contentDescription = "Starred") },
+                        icon = { Icon(Icons.Filled.Favorite, contentDescription = "Starred") },
                         label = { Text("Starred") },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color.White,
@@ -125,9 +115,13 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "login", // static start
+            startDestination = "splash", // static start
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable("splash") {
+                val loginState = userPreferences.getLoginState().collectAsState(initial = null)
+                SplashScreen(navController, loginState )
+            }
             composable("login") {
                 val viewModel: LoginViewModel = hiltViewModel()
                 Login(viewModel, navController)
@@ -138,7 +132,9 @@ fun AppNavHost(navController: NavHostController, userPreferences: UserPreference
             }
             composable("search") { Search() }
             composable("profile") { Profile(navController = navController) }
-            composable("starred") { Search() }
+            composable("starred") {
+                val viewModel: HomeViewModel = hiltViewModel()
+                Starred(viewModel, navController) }
             composable("loginreal") {
                 val viewModel: LoginRealViewModel = hiltViewModel()
                 LoginReal(navController = navController, viewModel = viewModel)

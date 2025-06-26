@@ -86,5 +86,33 @@ class HomeViewModel @Inject constructor(
         _selectedRepo.value = repo
     }
 
+    fun toggleStarred(context: Context, repoId: Int, isStarred: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val dbHelper = UserHelper(context)
+            dbHelper.updateRepoStarred(repoId, isStarred)
+            val currentList = _repos.value?.toMutableList() ?: mutableListOf()
+            val updatedList = currentList.map {
+                if (it.id == repoId) it.copy(starred = if (isStarred) 1 else 0)
+                else it
+            }
+            _repos.postValue(updatedList)
+        }
+    }
+
+
+
+    private val _starredRepos = MutableLiveData<List<ResponseItem>>()
+    val starredRepos: LiveData<List<ResponseItem>> = _starredRepos
+
+    fun loadStarredReposFromDb(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userPreferences.getUserData().collect { username ->
+                val dbHelper = UserHelper(context)
+                val repos = dbHelper.getStarredRepos(username.toString())
+                _starredRepos.postValue(repos)
+            }
+        }
+    }
+
 
 }
